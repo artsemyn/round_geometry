@@ -1,6 +1,5 @@
-// lib/sidebar.dart
 import 'package:flutter/material.dart';
-import 'package:round_geometry/ui/pages/materi3d_page.dart';
+import 'package:round_geometry/pages/profil_page.dart';
 
 class SideMenu extends StatelessWidget {
   final int currentIndex;
@@ -10,119 +9,69 @@ class SideMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const dark = Color(0xFF1C1C1C);
+    const brandGreen = Color(0xFF57D364);
 
     return Drawer(
       backgroundColor: dark,
       child: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(16),
+        child: Column(
           children: [
-            const Padding(
-              padding: EdgeInsets.only(left: 4, bottom: 8),
-              child: Text('MENU',
-                  style: TextStyle(color: Colors.white70, letterSpacing: 1.5)),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(18),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header title
-                  Row(
-                    children: const [
-                      Icon(Icons.star, color: Colors.green),
-                      SizedBox(width: 8),
-                      Text(
-                        'ROUND GEOMETRY',
-                        style: TextStyle(
-                          color: Colors.green,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  const Text(
-                    'OVERVIEW',
-                    style: TextStyle(
-                      color: Colors.black54,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Items utama
-                  _item(context, 0, currentIndex, Icons.home, 'Beranda', onSelect),
-                  _item(context, 1, currentIndex, Icons.people, 'Komunitas', onSelect),
-
-                  // Item Materi (mengganti body utama)
-                  _item(context, 2, currentIndex, Icons.book, 'Materi', onSelect),
-
-                  // Submenu: buka Materi3DPage langsung dengan model tertentu
-                  Padding(
-                    padding: const EdgeInsets.only(left: 44), // indent agar kelihatan submenu
-                    child: Column(
-                      children: [
-                        ListTile(
-                          dense: true,
-                          contentPadding: EdgeInsets.zero,
-                          title: const Text('– Tabung',
-                              style: TextStyle(color: Colors.black87)),
-                          onTap: () {
-                            Navigator.of(context).pop(); // tutup drawer
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => const Materi3DPage(
-                                  initialSrc: 'assets/models/cylinder.glb',
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                        ListTile(
-                          dense: true,
-                          contentPadding: EdgeInsets.zero,
-                          title: const Text('– Kerucut',
-                              style: TextStyle(color: Colors.black87)),
-                          onTap: () {
-                            Navigator.of(context).pop();
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => const Materi3DPage(
-                                  initialSrc: 'assets/models/cone.glb',
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                        ListTile(
-                          dense: true,
-                          contentPadding: EdgeInsets.zero,
-                          title: const Text('– Bola',
-                              style: TextStyle(color: Colors.black87)),
-                          onTap: () {
-                            Navigator.of(context).pop();
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => const Materi3DPage(
-                                  initialSrc: 'assets/models/sphere.glb',
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  _item(context, 3, currentIndex, Icons.assignment, 'Soal', onSelect),
-                  _item(context, 4, currentIndex, Icons.contact_mail, 'Kontak', onSelect),
+            // header
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 14, 20, 10),
+              child: Row(
+                children: const [
+                  Icon(Icons.star, color: brandGreen, size: 22),
+                  SizedBox(width: 8),
+                  Text('ROUND GEOMETRY',
+                      style: TextStyle(color: brandGreen, fontWeight: FontWeight.w800)),
                 ],
+              ),
+            ),
+
+            // menu
+            Expanded(
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(18),
+                ),
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                child: ListView(
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(left: 4, bottom: 8),
+                      child: Text('OVERVIEW',
+                          style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w700, fontSize: 12)),
+                    ),
+                    _item(context, 0, currentIndex, Icons.home_rounded, 'Beranda', onSelect),
+                    _item(context, 1, currentIndex, Icons.people_alt_rounded, 'Komunitas', onSelect),
+                    _item(context, 2, currentIndex, Icons.menu_book_rounded, 'Materi', onSelect),
+                    _item(context, 3, currentIndex, Icons.assignment_rounded, 'Soal', onSelect),
+                    _item(context, 4, currentIndex, Icons.mail_outline_rounded, 'Kontak', onSelect),
+                    const Divider(height: 24),
+                    // tombol Profil (langsung push halaman profil)
+                    ListTile(
+                      dense: true,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 0),
+                      leading: const Icon(Icons.account_circle_rounded, color: brandGreen),
+                      title: const Text('Profil', style: TextStyle(fontWeight: FontWeight.w600)),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProfilPage()));
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // footer kecil
+            const Padding(
+              padding: EdgeInsets.fromLTRB(20, 10, 20, 16),
+              child: Opacity(
+                opacity: .6,
+                child: Text('v0.1 • MVP', style: TextStyle(color: Colors.white, fontSize: 12)),
               ),
             ),
           ],
@@ -140,18 +89,19 @@ class SideMenu extends StatelessWidget {
     ValueChanged<int> onTap,
   ) {
     final active = i == current;
+    const brandGreen = Color(0xFF57D364);
     return ListTile(
       dense: true,
       contentPadding: const EdgeInsets.symmetric(horizontal: 0),
-      leading: Icon(icon, color: active ? Colors.green : Colors.black87),
+      leading: Icon(icon, color: active ? brandGreen : Colors.black87),
       title: Text(
         label,
         style: TextStyle(
-          color: active ? Colors.green : Colors.black87,
-          fontWeight: active ? FontWeight.w600 : FontWeight.w400,
+          color: active ? brandGreen : Colors.black87,
+          fontWeight: active ? FontWeight.w700 : FontWeight.w400,
         ),
       ),
-      onTap: () => onTap(i), // ganti konten body utama via Shell
+      onTap: () => onTap(i),
     );
   }
 }

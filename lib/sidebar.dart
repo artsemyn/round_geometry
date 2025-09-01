@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:round_geometry/pages/profil_page.dart';
 
 class SideMenu extends StatelessWidget {
   final int currentIndex;
@@ -16,7 +15,7 @@ class SideMenu extends StatelessWidget {
       child: SafeArea(
         child: Column(
           children: [
-            // header
+            // Header
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 14, 20, 10),
               child: Row(
@@ -29,7 +28,7 @@ class SideMenu extends StatelessWidget {
               ),
             ),
 
-            // menu
+            // Menu Items
             Expanded(
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -41,37 +40,19 @@ class SideMenu extends StatelessWidget {
                   children: [
                     const Padding(
                       padding: EdgeInsets.only(left: 4, bottom: 8),
-                      child: Text('OVERVIEW',
-                          style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w700, fontSize: 12)),
+                      child: Text(
+                        'OVERVIEW',
+                        style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w700, fontSize: 12),
+                      ),
                     ),
                     _item(context, 0, currentIndex, Icons.home_rounded, 'Beranda', onSelect),
                     _item(context, 1, currentIndex, Icons.people_alt_rounded, 'Komunitas', onSelect),
                     _item(context, 2, currentIndex, Icons.menu_book_rounded, 'Materi', onSelect),
                     _item(context, 3, currentIndex, Icons.assignment_rounded, 'Soal', onSelect),
                     _item(context, 4, currentIndex, Icons.mail_outline_rounded, 'Kontak', onSelect),
-                    const Divider(height: 24),
-                    // tombol Profil (langsung push halaman profil)
-                    ListTile(
-                      dense: true,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 0),
-                      leading: const Icon(Icons.account_circle_rounded, color: brandGreen),
-                      title: const Text('Profil', style: TextStyle(fontWeight: FontWeight.w600)),
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProfilPage()));
-                      },
-                    ),
+                    _item(context, 5, currentIndex, Icons.account_circle_rounded, 'Profil', onSelect),
                   ],
                 ),
-              ),
-            ),
-
-            // footer kecil
-            const Padding(
-              padding: EdgeInsets.fromLTRB(20, 10, 20, 16),
-              child: Opacity(
-                opacity: .6,
-                child: Text('v0.1 • MVP', style: TextStyle(color: Colors.white, fontSize: 12)),
               ),
             ),
           ],
@@ -101,7 +82,11 @@ class SideMenu extends StatelessWidget {
           fontWeight: active ? FontWeight.w700 : FontWeight.w400,
         ),
       ),
-      onTap: () => onTap(i),
+      onTap: () {
+        // Close the drawer before switching content
+        Navigator.of(c).pop();
+        onTap(i);
+      },
     );
   }
 }

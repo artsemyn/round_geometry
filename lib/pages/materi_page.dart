@@ -1,84 +1,59 @@
 import 'package:flutter/material.dart';
-import 'soal_page.dart';  // Bisa diubah ke halaman lain sesuai navigasi
+import '../services/materi_service.dart';
+import 'materi3d_page.dart';
 
-class MateriPage extends StatelessWidget {
+class MateriPage extends StatefulWidget {
   const MateriPage({super.key});
+  @override
+  State<MateriPage> createState() => _MateriPageState();
+}
+
+class _MateriPageState extends State<MateriPage> {
+  final MateriService _service = MateriService();
+  List<Map<String, dynamic>> _materi = [];
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final data = await _service.fetchMateri();
+    setState(() {
+      _materi = data;
+      _loading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Materi')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: GridView.builder(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,  // Atur jumlah kolom
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 1.2,
-          ),
-          itemCount: 6, // Misalnya ada 6 materi
-          itemBuilder: (context, index) {
-            return _CardMateri(
-              title: 'Materi ${index + 1}',
-              onOpen: () {
-                // Navigasi ke SoalPage atau materi lainnya
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const SoalPage()),
+      appBar: AppBar(title: const Text("Materi")),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView.builder(
+              itemCount: _materi.length,
+              itemBuilder: (c, i) {
+                final m = _materi[i];
+                return ListTile(
+                  title: Text(m['judul']),
+                  subtitle: Text(m['deskripsi'] ?? ""),
+                  trailing: const Icon(Icons.arrow_forward),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => Materi3DPage(
+                          title: m['judul'],
+                          glbUrl: m['glb_url'],
+                        ),
+                      ),
+                    );
+                  },
                 );
-              },
-            );
-          },
-        ),
-      ),
+              }),
     );
   }
 }
-
-class _CardMateri extends StatelessWidget {
-  final String title;
-  final VoidCallback onOpen;  // Tidak perlu const karena onOpen adalah fungsi
-
-  const _CardMateri({
-    required this.title,
-    required this.onOpen,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: const Color(0xFFE6E8EC)),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: const [BoxShadow(blurRadius: 18, color: Color(0x14000000), offset: Offset(0, 8))],
-      ),
-      child: Column(
-        children: [
-          Container(
-            height: 120,
-            alignment: Alignment.center,
-            decoration: const BoxDecoration(
-              color: Color(0xFFF8FAFC),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-            ),
-            child: const Icon(Icons.view_in_ar_rounded, size: 42, color: Color(0xFF475467)),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(14),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: onOpen,
-                child: const Text('Buka'),
-              ),
-            ]),
-          ),
-        ],
-      ),
-    );
-  }
-}
-

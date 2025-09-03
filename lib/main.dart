@@ -1,68 +1,38 @@
 import 'package:flutter/material.dart';
-import 'sidebar.dart';  // Import Sidebar
-import 'pages/materi_page.dart';  // Import MateriPage
-import 'pages/soal_page.dart'; // Import SoalPage
+import 'pages/beranda_page.dart';
+import 'pages/komunitas_page.dart';
+import 'pages/materi_page.dart';
+import 'pages/soal_page.dart';
+import 'pages/kontak_page.dart';
+import 'pages/profil_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'core/config.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  await Supabase.initialize(
+    url: AppConfig.supabaseUrl,
+    anonKey: AppConfig.supabaseAnonKey,
+  );
+  runApp(const App());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class App extends StatelessWidget {
+  const App({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Round Geometry',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-      ),
-      home: const MainPage(),
-    );
-  }
-}
-
-class MainPage extends StatefulWidget {
-  const MainPage({super.key});
-
-  @override
-  State<MainPage> createState() => _MainPageState();
-}
-
-class _MainPageState extends State<MainPage> {
-  int currentIndex = 0;
-
-  void _onSelect(int index) {
-    setState(() {
-      currentIndex = index;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: SideMenu(currentIndex: currentIndex, onSelect: _onSelect),
-      appBar: AppBar(title: const Text('Round Geometry')),
-      body: Builder(
-        builder: (context) {
-          switch (currentIndex) {
-            case 0:
-              return const Center(child: Text('Beranda'));
-            case 1:
-              return const Center(child: Text('Komunitas'));
-            case 2:
-              return const MateriPage();
-            case 3:
-              return const SoalPage();
-            case 4:
-              return const Center(child: Text('Kontak'));
-            case 5:
-              return const Center(child: Text('Profil'));
-            default:
-              return const MateriPage();
-          }
-        },
-      ),
+      theme: ThemeData(useMaterial3: true, colorSchemeSeed: const Color(0xFF57D364)),
+      initialRoute: '/', // beranda default
+      routes: {
+        '/': (context) => const BerandaPage(),
+        '/komunitas': (context) => const KomunitasPage(),
+        '/materi': (context) => const MateriPage(),   // <<< Materi route
+        '/soal': (context) => const SoalPage(),
+        '/kontak': (context) => const KontakPage(),
+        '/profil': (context) => const ProfilPage(),
+      },
     );
   }
 }

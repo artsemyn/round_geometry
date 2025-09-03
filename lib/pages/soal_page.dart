@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/ai_grader_service.dart';
+import '../sidebar.dart';
 
 class SoalPage extends StatefulWidget {
   const SoalPage({super.key});
@@ -64,6 +65,7 @@ class _SoalPageState extends State<SoalPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const SideMenu(currentIndex: 3, onSelect: _noop),
       appBar: AppBar(title: const Text("Soal")),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -109,6 +111,8 @@ class _SoalPageState extends State<SoalPage> {
     );
   }
 }
+
+void _noop(int _) {}
 
 // helper chip (punya kamu – aku biarkan di file yang sama untuk simpel)
 Widget _scoreChips(List<int> scores) {

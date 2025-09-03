@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../features/gamification/stats_service.dart';
+import '../sidebar.dart';
 
 class ProfilPage extends StatefulWidget {
   const ProfilPage({super.key});
@@ -44,6 +45,7 @@ class _ProfilPageState extends State<ProfilPage> {
   Widget build(BuildContext context) {
     if (loading) return const Scaffold(body: Center(child: CircularProgressIndicator()));
     return Scaffold(
+      drawer: const SideMenu(currentIndex: 5, onSelect: _noop),
       appBar: AppBar(title: const Text('Profil')),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -90,3 +92,5 @@ class _ProfilPageState extends State<ProfilPage> {
     );
   }
 }
+
+void _noop(int _) {}

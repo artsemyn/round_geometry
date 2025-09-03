@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'materi_page.dart';
+import '../sidebar.dart';
 
 class BerandaPage extends StatelessWidget {
   const BerandaPage({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const SideMenu(currentIndex: 0, onSelect: _noop),
       appBar: AppBar(title: const Text('Beranda')),
       body: Center(
         child: ElevatedButton(
@@ -16,3 +18,5 @@ class BerandaPage extends StatelessWidget {
     );
   }
 }
+
+void _noop(int _) {}

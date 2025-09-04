@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../services/materi_repo_service.dart';
+import '../services/materi_repo_service.dart'; // ganti sesuai path repo kamu
 import 'materi3d_page.dart';
+import 'materi_detail_page.dart';
 
 class MateriPage extends StatefulWidget {
   const MateriPage({super.key});
@@ -21,9 +22,23 @@ class _MateriPageState extends State<MateriPage> {
 
   Future<void> _reload() async {
     setState(() {
-      _future = repo.fetchMateri();
+      _future = repo.fetchMateri(); // regenerate signed URL setiap refresh
     });
     await _future;
+  }
+
+  void _openLesson(String title, String url, String desc) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MateriDetailPage(
+          title: title,
+          description: desc,
+          glbUrl: url,
+    ),
+  ),
+);
+
   }
 
   @override
@@ -32,10 +47,7 @@ class _MateriPageState extends State<MateriPage> {
       appBar: AppBar(
         title: const Text('Materi'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded),
-            onPressed: _reload,
-          ),
+          IconButton(onPressed: _reload, icon: const Icon(Icons.refresh_rounded)),
         ],
       ),
       body: RefreshIndicator(
@@ -47,46 +59,87 @@ class _MateriPageState extends State<MateriPage> {
               return const Center(child: CircularProgressIndicator());
             }
             if (snap.hasError) {
-              return Center(child: Text('Error: ${snap.error}'));
+              return ListView(
+                children: [
+                  const SizedBox(height: 80),
+                  Center(child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text('Error: ${snap.error}'),
+                  )),
+                ],
+              );
             }
 
             final items = snap.data ?? [];
             if (items.isEmpty) {
-              return const Center(child: Text('Belum ada materi'));
+              return ListView(
+                children: const [
+                  SizedBox(height: 80),
+                  Center(child: Text('Belum ada materi')),
+                ],
+              );
             }
 
             return ListView.separated(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 24),
               itemCount: items.length,
-              separatorBuilder: (_, __) => const Divider(),
-              itemBuilder: (_, i) {
+              separatorBuilder: (_, __) => const Divider(height: 1),
+              itemBuilder: (context, i) {
                 final m = items[i];
-                final url = m['glb_url'] as String?;
-                final title = m['title'] ?? '';
-                final desc = m['description'] ?? '';
+                final title = (m['title'] ?? '') as String;
+                final desc  = (m['description'] ?? '') as String;
+                final url   = m['glb_url'] as String?;
+                final note  = m['note'] as String?;
                 final canOpen = url != null && url.isNotEmpty;
 
-                return ListTile(
-                  leading: const Icon(Icons.view_in_ar),
-                  title: Text(title),
-                  subtitle: Text(desc.isEmpty ? 'Tanpa deskripsi' : desc),
-                  trailing: Icon(
-                    canOpen ? Icons.chevron_right : Icons.block,
-                    color: canOpen ? null : Colors.red,
-                  ),
-                  onTap: !canOpen
-                      ? null
-                      : () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => Materi3DPage(
-                                title: title,
-                                glbUrl: url!,
+                return Card(
+                  elevation: 0,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8),
+                          child: Icon(Icons.view_in_ar_rounded, size: 28),
+                        ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+                              const SizedBox(height: 2),
+                              Text(
+                                note?.isNotEmpty == true
+                                    ? '❗ $note'
+                                    : (desc.isEmpty ? 'Tanpa deskripsi' : desc),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(color: Colors.grey.shade700),
                               ),
-                            ),
-                          );
-                        },
+                              const SizedBox(height: 8),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: [
+                                  FilledButton.icon(
+                                    onPressed: canOpen ? () => _openPreview3D(title, url!) : null,
+                                    icon: const Icon(Icons.play_circle_fill_rounded),
+                                    label: const Text('Preview 3D'),
+                                  ),
+                                  OutlinedButton.icon(
+                                    onPressed: canOpen ? () => _openLesson(title, url!) : null,
+                                    icon: const Icon(Icons.menu_book_rounded),
+                                    label: const Text('Materi Interaktif'),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 );
               },
             );

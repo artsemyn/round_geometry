@@ -1,0 +1,4 @@
+trimesh[easy]==4.4.3
+numpy
+supabase==2.6.0
+python-dotenv

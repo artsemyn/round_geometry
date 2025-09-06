@@ -10,8 +10,8 @@ import 'core/config.dart';
 
 void main() async {
   await Supabase.initialize(
-    url: AppConfig.supabaseUrl,
-    anonKey: AppConfig.supabaseAnonKey,
+    url: AppConfig.current().supabaseUrl,
+    anonKey: AppConfig.current().supabaseAnonKey,
   );
   runApp(const App());
 }

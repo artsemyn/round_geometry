@@ -115,15 +115,26 @@ class _MateriDetailPageState extends State<MateriDetailPage>
   Object _buildCylinder(double r, double h,
       {int segments = 48, required Color color, double opacity = 1.0}) {
     final vertices = <vmath.Vector3>[];
-    final faces = <Face>[];
+    final indices = <int>[];
+    final colorList = <vmath.Vector4>[];
 
     final double halfH = h / 2.0;
     const topCenterIndex = 0;
     const bottomCenterIndex = 1;
 
+    // Convert color to Vector4 with opacity
+    final vColor = vmath.Vector4(
+      color.red / 255.0,
+      color.green / 255.0,
+      color.blue / 255.0,
+      opacity,
+    );
+
     // pusat atas & bawah
     vertices.add(vmath.Vector3(0,  halfH, 0)); // 0
     vertices.add(vmath.Vector3(0, -halfH, 0)); // 1
+    colorList.add(vColor);
+    colorList.add(vColor);
 
     // cincin atas & bawah
     for (int i = 0; i < segments; i++) {
@@ -132,6 +143,8 @@ class _MateriDetailPageState extends State<MateriDetailPage>
       final z = r * math.sin(t);
       vertices.add(vmath.Vector3(x,  halfH, z)); // 2..(2+segments-1)
       vertices.add(vmath.Vector3(x, -halfH, z)); // selang-seling
+      colorList.add(vColor);
+      colorList.add(vColor);
     }
 
     // sisi (dua segitiga per segmen)
@@ -141,26 +154,39 @@ class _MateriDetailPageState extends State<MateriDetailPage>
       final iTopB = 2 + (((i + 1) % segments) * 2);
       final iBotB = iTopB + 1;
 
-      faces.add(Face(iTopA, iBotA, iTopB, color: color.withOpacity(opacity)));
-      faces.add(Face(iBotA, iBotB, iTopB, color: color.withOpacity(opacity)));
+      // First triangle
+      indices.addAll([iTopA, iBotA, iTopB]);
+      // Second triangle
+      indices.addAll([iBotA, iBotB, iTopB]);
     }
 
     // tutup atas (fan)
     for (int i = 0; i < segments; i++) {
       final iTopA = 2 + (i * 2);
       final iTopB = 2 + (((i + 1) % segments) * 2);
-      faces.add(Face(topCenterIndex, iTopA, iTopB, color: color.withOpacity(opacity)));
+      indices.addAll([topCenterIndex, iTopA, iTopB]);
     }
 
     // tutup bawah (fan) — urutan dibalik agar normal keluar
     for (int i = 0; i < segments; i++) {
       final iBotA = 2 + (i * 2) + 1;
       final iBotB = 2 + (((i + 1) % segments) * 2) + 1;
-      faces.add(Face(bottomCenterIndex, iBotB, iBotA, color: color.withOpacity(opacity)));
+      indices.addAll([bottomCenterIndex, iBotB, iBotA]);
     }
 
-    final mesh = Mesh(vertices: vertices, faces: faces)..backfaceCulling = false;
-    return Object(name: 'cylinder')..mesh = mesh;
+    // Create mesh with proper parameters for flutter_cube
+    final mesh = Mesh(
+      vertices: vertices,
+      indices: indices,
+      textureCoordinates: List.filled(vertices.length, vmath.Vector2.zero()),
+      colors: colorList,
+    );
+    
+    return Object(
+      name: 'cylinder',
+      mesh: mesh,
+      backfaceCulling: false,
+    );
   }
 
   // ====== Helper: silinder tipis sebagai "garis" ======
